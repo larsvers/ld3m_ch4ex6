@@ -4,7 +4,7 @@
 <title>11 Hexbin maps - example 6</title>
 <meta charset="utf-8">
 
-<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/d3.v5.min.js"></script>
 <script src="//d3js.org/topojson.v1.min.js"></script>
 <script src="//d3js.org/d3-color.v1.min.js"></script> 
 <script src="//d3js.org/d3-interpolate.v1.min.js"></script> 
@@ -250,9 +250,7 @@ function prepData(topo) {
 /* Load and build steps */
 /* ==================== */
 
-function ready(error, us, markets) {
-	if (error) throw error;
-
+function ready(us, markets) {
 
 	var us = prepData(us);
 
@@ -286,10 +284,17 @@ function ready(error, us, markets) {
 } // ready()
 
 // Load data sources
-d3.queue()
-	.defer(d3.json, 'data/us.json')
-	.defer(d3.json, 'data/markets_overall.json')
-	.await(ready);
+var usData = d3.json('data/us.json').then(function(us) { return us; });
+var marketData = d3.json('data/markets_overall.json').then(function(markets) { return markets; });
+
+Promise.all([usData, marketData]).then(function(response) {
+
+	var usResolved = response[0];
+	var marketsResolved = response[1];
+
+	ready(usResolved, marketsResolved);
+
+});
 
 
 </script>
